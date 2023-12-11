@@ -1,0 +1,226 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/08/2023 22:23:14 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX51.H>
+   2          
+   3          // Cau hinh Cot
+   4          #define C1 P1_7
+   5          #define C2 P1_6
+   6          #define C3 P1_5
+   7          #define C4 P1_4
+   8          
+   9          // Cau hinh Hang
+  10          #define H1 P1_0
+  11          #define H2 P1_1
+  12          #define H3 P1_2
+  13          #define H4 P1_3
+  14          
+  15          // Dinh nghia chan  hien thi LCD
+  16          #define D0 P2_0       // chan D0
+  17          #define D1 P2_1       // chan D1
+  18          #define D2 P2_2
+  19          #define D3 P2_3
+  20          #define D4 P2_4
+  21          #define D5 P2_5
+  22          #define D6 P2_6
+  23          #define D7 P2_7       // chan D7
+  24          
+  25          #define RS P3_0     // chan RS
+  26          #define RW P3_1     // Chan RW
+  27          #define EN     P3_2     // Chan E
+  28          
+  29          // Dinh nghia Ban Phim [H] [C]
+  30          unsigned char KEYPAD4X4 [4][4] = { '1', '2', '3', 'A', // (H 1, COT 1) so 3, (H 1, COT 2) so 2,
+  31                                             '4', '5', '6', 'B',
+  32                                             '7', '8', '9', 'C',
+  33                                             '*', '0', '#', 'D'};
+  34          unsigned char key=0;
+  35                                             
+  36          void Lcd_Cauhinh(void);   // Khoi tao LCD
+  37          void Lcd_Ghi_Lenh(char lenh);   // Ghi lenh
+  38          void Lcd_Ghi_Dulieu(char dulieu); // Ham Ghi du lieu
+  39          void Delay(int t);
+  40          
+  41          // ham xuat du lieu
+  42          void Lcd_Dulieu(unsigned char dulieu){
+  43   1        D0 = dulieu & 0x01;
+  44   1        D1 = (dulieu >> 1) & 0x01;
+  45   1        D2 = (dulieu >> 2) & 0x01;
+  46   1        D3 = (dulieu >> 3) & 0x01;
+  47   1        D4 = (dulieu >> 4) & 0x01;
+  48   1        D5 = (dulieu >> 5) & 0x01;
+  49   1        D6 = (dulieu >> 6) & 0x01;
+  50   1        D7 = (dulieu >> 7) & 0x01;
+  51   1      }
+  52          
+  53          void Lcd_Cauhinh(void){
+  54   1        Lcd_Ghi_Lenh(0x03);
+C51 COMPILER V9.60.7.0   MAIN                                                              12/08/2023 22:23:14 PAGE 2   
+
+  55   1        Lcd_Ghi_Lenh(0x38);         // Giao tiep voi XL 8 chan(D0 - D7)
+  56   1        // Lcd_Ghi_Lenh(0x28);      // Giao tiep voi VXL 4 chan(D4 - D7)
+  57   1        Lcd_Ghi_Lenh(0x06);         // Tu dong dua con tro den tri tri tiep theo (trai -> phai)
+  58   1        Lcd_Ghi_Lenh(0x0c);         // Bat hien thi con tro
+  59   1        Lcd_Ghi_Lenh(0x01);         // Xoa man hinh
+  60   1      }
+  61          
+  62          void Lcd_Ghi_Lenh(char lenh){
+  63   1        RS = 0;                     // muc thap, chon che do ghi lenh
+  64   1        RW = 0;                     // muc thap, chon che do thanh ghi  
+  65   1        EN = 1;                     // muc cao, chuan bi tao su chuyen muc logic tu "1" -> "0" tao tin hieu cho phep ghi
+  66   1        Lcd_Dulieu(lenh);
+  67   1        Delay(10);
+  68   1        EN = 0;                     // muc thap, hoan tat su tao chuyen muc logic "1" sang "0"
+  69   1        Delay(10);
+  70   1      }
+  71          
+  72          
+  73          void Lcd_Ghi_Dulieu(char dulieu){
+  74   1        RS = 1;               
+  75   1        RW = 0;
+  76   1        EN = 1;
+  77   1        Lcd_Dulieu(dulieu);
+  78   1        Delay(10);
+  79   1        EN = 0;
+  80   1        Delay(10);
+  81   1      }
+  82          
+  83          void LCD_Ghi_Chuoi(char *str){
+  84   1        while(*str){
+  85   2          Lcd_Ghi_Dulieu(*str);
+  86   2          str++;
+  87   2        }
+  88   1      }
+  89          
+  90          void Delay(int t){
+  91   1        int x, y;
+  92   1        for(x = 0; x < t; x++){
+  93   2          for(y = 0; y < 123; y++);
+  94   2        }
+  95   1      }
+  96          
+  97          /* 
+  98            Kiem tra phim co duoc nhan hay khong
+  99            1: Phim duoc nhan
+ 100            0: Phim k duoc nhan
+ 101                                             
+ 102          */
+ 103          unsigned char KEY4X4_Nhan(void){
+ 104   1        if((H1 == 0)|(H2 == 0)|(H3 == 0)|(H4 == 0))
+ 105   1          return 1;
+ 106   1        else 
+ 107   1          return 0;
+ 108   1      }
+ 109          /*
+ 110            Quet tung cot tren Keypad
+ 111            C: Cot can quet
+ 112          */
+ 113          void Ktr_KEY4X4(unsigned char Cot){
+ 114   1        C1 = 1;
+ 115   1        C2 = 1;
+ 116   1        C3 = 1;
+C51 COMPILER V9.60.7.0   MAIN                                                              12/08/2023 22:23:14 PAGE 3   
+
+ 117   1        C4 = 1;
+ 118   1        
+ 119   1        if(Cot == 0){
+ 120   2          C1 = 0;
+ 121   2        }
+ 122   1        else if(Cot == 1){
+ 123   2          C2 = 0;
+ 124   2        }
+ 125   1        else if(Cot == 2){
+ 126   2          C3 = 0;
+ 127   2        }
+ 128   1        else if(Cot == 3){
+ 129   2          C4 = 0;
+ 130   2        }
+ 131   1      }
+ 132          
+ 133          /*
+ 134            Doc va tra ve gia tri nut nhan
+ 135          */
+ 136          
+ 137          unsigned char KEY4X4_KQ(void){
+ 138   1        unsigned char i;
+ 139   1        // Cho Cot 1 den Cot 4
+ 140   1        C1 = 0;
+ 141   1        C2 = 0;
+ 142   1        C3 = 0;
+ 143   1        C4 = 0;
+ 144   1        
+ 145   1        // Kiem tra nhan phim
+ 146   1        if(KEY4X4_Nhan() == 1){
+ 147   2          Delay(1);
+ 148   2          if(KEY4X4_Nhan() == 1){         // Kiem tra chinh xac nut co duoc nhan hay  khong
+ 149   3            for(i = 0; i < 4; i++){
+ 150   4              Ktr_KEY4X4(i);
+ 151   4              if(H1 == 0){                // Neu hang 1 duoc nhan
+ 152   5                return KEYPAD4X4[0][i];   // tra ve ky tu nhan duoc o hang 1 va quet cot tu cot 1 den 4
+ 153   5              }
+ 154   4              else if(H2 == 0){               // Neu hang 1 duoc nhan
+ 155   5                return KEYPAD4X4[1][i];   // tra ve ky tu nhan duoc o hang 2 va quet cot tu cot 1 den 4
+ 156   5              }
+ 157   4              else if(H3 == 0){               // Neu hang 1 duoc nhan
+ 158   5                return KEYPAD4X4[2][i];   // tra ve ky tu nhan duoc o hang 3 va quet cot tu cot 1 den 4
+ 159   5              }
+ 160   4              else if(H4 == 0){               // Neu hang 1 duoc nhan
+ 161   5                return KEYPAD4X4[3][i];   // tra ve ky tu nhan duoc o hang 4 va quet cot tu cot 1 den 4
+ 162   5              }
+ 163   4            }
+ 164   3          }
+ 165   2        }
+ 166   1        return 0;
+ 167   1      }
+ 168          
+ 169          void Keypad_init(){
+ 170   1        // Dau tien cot = 0;
+ 171   1        C1 = 0;
+ 172   1        C2 = 0;
+ 173   1        C3 = 0;
+ 174   1        C4 = 0;
+ 175   1        
+ 176   1        // Dau tien cho hang = 0;
+ 177   1        H1 = 1;
+ 178   1        H2 = 1;
+C51 COMPILER V9.60.7.0   MAIN                                                              12/08/2023 22:23:14 PAGE 4   
+
+ 179   1        H3 = 1;
+ 180   1        H4 = 1;
+ 181   1      }
+ 182          
+ 183          int main(){
+ 184   1        Lcd_Cauhinh();               //Thiet lap cau hinh cho LCD 
+ 185   1        Keypad_init();               //goi ham khai bao ma tran phim 4x4
+ 186   1        Lcd_Ghi_Lenh(0X81);         //hien thi cot thu 2, LCD 16x02
+ 187   1        LCD_Ghi_Chuoi("KEYPAD 4X4");
+ 188   1        while(1){
+ 189   2          key = KEY4X4_KQ();
+ 190   2          if(key != 0){
+ 191   3            Lcd_Ghi_Lenh(0XC0);
+ 192   3            Lcd_Ghi_Dulieu(key);
+ 193   3          }
+ 194   2        }
+ 195   1      }
+ 196          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    415    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     17       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

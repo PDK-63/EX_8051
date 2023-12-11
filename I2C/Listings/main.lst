@@ -1,0 +1,703 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\LCD4bit;.\User) DEBUG OBJECTEXT
+                    -END PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2            Bai toan hien thi thoi gian thuc DS1307 len man hinh LCD
+   3            LCD su dung 16x02, 4bit(D4 - D7)
+   4            Su dung DS1307, giao tiep qua chuan I2C, 2 chan SCL va SDA phai co tro keo len duong nguon(4.7K)
+   5            
+   6          */
+   7          #include<reg51.h>
+   8          
+   9          #include<stdio.h>
+  10          
+  11          #define lcdport P1
+  12          
+  13          
+  14          sbit rs=P1^0;
+  15          
+  16          sbit en=P1^1;
+  17          
+  18          
+  19          sbit SDA=P2^1;                
+  20          
+  21          sbit SCL=P2^0;
+  22          
+  23          
+  24          sbit next=P2^2;                     //increment digit
+  25          
+  26          sbit inc=P2^3;                     //increment value
+  27          
+  28          sbit set=P2^4;                     //set time 
+  29          
+  30          
+  31          char ack;
+  32          
+  33          unsigned char day1=1;
+  34          
+  35          unsigned char k,x;
+  36          
+  37          unsigned int date=1, mon=1, hour=0, min=0, sec=0;  
+  38          
+  39          int year=0; 
+  40          
+  41          
+  42           void delay(int itime)
+  43          
+  44          {
+  45   1      
+  46   1          int i,j;
+  47   1      
+  48   1          for(i=0;i<itime;i++)
+  49   1      
+  50   1          for(j=0;j<1275;j++);
+  51   1      
+  52   1      }
+  53          
+  54          
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 2   
+
+  55          void daten()
+  56          
+  57          {
+  58   1      
+  59   1          rs=1;
+  60   1      
+  61   1          en=1;
+  62   1      
+  63   1          delay(1);
+  64   1      
+  65   1          en=0;
+  66   1      
+  67   1      }
+  68          
+  69          
+  70          void lcddata(unsigned char ch)
+  71          
+  72          {
+  73   1      
+  74   1          lcdport=ch & 0xf0;
+  75   1      
+  76   1          daten();
+  77   1      
+  78   1          lcdport=(ch<<4) & 0xf0;
+  79   1      
+  80   1          daten();
+  81   1      
+  82   1      }
+  83          
+  84          
+  85          void cmden(void)
+  86          
+  87          {
+  88   1      
+  89   1          rs=0;
+  90   1      
+  91   1          en=1;
+  92   1      
+  93   1          delay(1);
+  94   1      
+  95   1          en=0;
+  96   1      
+  97   1      }
+  98          
+  99          
+ 100          void lcdcmd(unsigned char ch)
+ 101          
+ 102          {
+ 103   1      
+ 104   1          lcdport=ch & 0xf0;
+ 105   1      
+ 106   1          cmden();
+ 107   1      
+ 108   1          lcdport=(ch<<4) & 0xf0;
+ 109   1      
+ 110   1          cmden();
+ 111   1      
+ 112   1      }
+ 113          
+ 114          
+ 115          void lcdprint(char *str)
+ 116          
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 3   
+
+ 117          {
+ 118   1      
+ 119   1          while(*str)
+ 120   1      
+ 121   1          {
+ 122   2      
+ 123   2              lcddata(*str);
+ 124   2      
+ 125   2              str++;
+ 126   2      
+ 127   2          }
+ 128   1      
+ 129   1      }
+ 130          
+ 131          
+ 132          void lcd_init(void)
+ 133          
+ 134          {
+ 135   1      
+ 136   1          lcdcmd(0x02);
+ 137   1      
+ 138   1          lcdcmd(0x28);
+ 139   1      
+ 140   1          lcdcmd(0x0c);
+ 141   1      
+ 142   1          lcdcmd(0x01);
+ 143   1      
+ 144   1      }
+ 145          
+ 146          
+ 147          void I2CStart(){SDA=1;SCL=1,SDA=0,SCL=0;}             //"start" function for communicate with ds1307 RTC
+ 148          
+ 149          void I2CStop(){SDA=0,SCL=1,SDA=1;}                     //"stop" function for communicate wit ds1307 RTC
+ 150          
+ 151           
+ 152          
+ 153          unsigned char I2CSend(unsigned char Data)             //send data to ds1307 
+ 154          
+ 155          {
+ 156   1      
+ 157   1      char i;
+ 158   1      
+ 159   1      char ack_bit;
+ 160   1      
+ 161   1      for(i=0;i<8;i++)
+ 162   1      
+ 163   1      {
+ 164   2      
+ 165   2      if(Data & 0x80) SDA=1;
+ 166   2      
+ 167   2      else SDA=0;
+ 168   2      
+ 169   2      SCL=1;
+ 170   2      
+ 171   2      Data<<=1;
+ 172   2      
+ 173   2      SCL=0;
+ 174   2      
+ 175   2      }
+ 176   1      
+ 177   1      SDA=1,SCL=1;
+ 178   1      
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 4   
+
+ 179   1      ack_bit=SDA;
+ 180   1      
+ 181   1      SCL=0;
+ 182   1      
+ 183   1      return ack_bit;
+ 184   1      
+ 185   1      }
+ 186          
+ 187           
+ 188          
+ 189          unsigned char I2CRead(char ack)                      //receive data from ds1307
+ 190          
+ 191          {
+ 192   1      
+ 193   1      unsigned char i, Data=0;
+ 194   1      
+ 195   1      SDA=1;
+ 196   1      
+ 197   1      for(i=0;i<8;i++)
+ 198   1      
+ 199   1      {
+ 200   2      
+ 201   2       Data<<=1;
+ 202   2      
+ 203   2       do{SCL=1;}
+ 204   2      
+ 205   2       while(SCL==0);
+ 206   2      
+ 207   2       if(SDA) Data|=1;
+ 208   2      
+ 209   2       SCL=0;
+ 210   2      
+ 211   2      }
+ 212   1      
+ 213   1      if(ack)SDA=0;
+ 214   1      
+ 215   1      else SDA=1;
+ 216   1      
+ 217   1      SCL=1;
+ 218   1      
+ 219   1      SCL=0;
+ 220   1      
+ 221   1      SDA=1;
+ 222   1      
+ 223   1      return Data;
+ 224   1      
+ 225   1      }
+ 226          
+ 227          
+ 228          
+ 229          /*void day(char d)                                // Function for display day on LCD
+ 230          
+ 231          {
+ 232          
+ 233          switch(d)
+ 234          
+ 235          {
+ 236          
+ 237            case 0:
+ 238          
+ 239            lcdprint("DAY");
+ 240          
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 5   
+
+ 241            break;
+ 242          
+ 243          
+ 244            case 1:
+ 245          
+ 246            lcdprint("SUN");
+ 247          
+ 248            break;
+ 249          
+ 250          
+ 251            case 2:
+ 252          
+ 253            lcdprint("MON");
+ 254          
+ 255            break;
+ 256          
+ 257          
+ 258            case 3:
+ 259          
+ 260            lcdprint("TUE");
+ 261          
+ 262            break;
+ 263          
+ 264          
+ 265            case 4:
+ 266          
+ 267            lcdprint("WED");
+ 268          
+ 269            break;
+ 270          
+ 271          
+ 272            case 5:
+ 273          
+ 274            lcdprint("THU");
+ 275          
+ 276            break;
+ 277          
+ 278          
+ 279            case 6:
+ 280          
+ 281            lcdprint("FRI");
+ 282          
+ 283            break;
+ 284          
+ 285          
+ 286            case 7:
+ 287          
+ 288            lcdprint("SAT");
+ 289          
+ 290            break;
+ 291          
+ 292           }
+ 293          
+ 294           }     */
+ 295          
+ 296          
+ 297          int BCDToDecimal(char bcdByte)
+ 298          
+ 299          {
+ 300   1      
+ 301   1             char a,b,dec;
+ 302   1      
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 6   
+
+ 303   1          a=(((bcdByte & 0xF0) >> 4) * 10);
+ 304   1      
+ 305   1          b=(bcdByte & 0x0F);
+ 306   1      
+ 307   1          dec=a+b;
+ 308   1      
+ 309   1          return dec;
+ 310   1      
+ 311   1      }
+ 312          
+ 313          
+ 314          char DecimalToBCD (int decimalByte)
+ 315          
+ 316          {
+ 317   1      
+ 318   1        char a,b,bcd;
+ 319   1      
+ 320   1        a=((decimalByte / 10) << 4);
+ 321   1      
+ 322   1        b= (decimalByte % 10);
+ 323   1      
+ 324   1        bcd=a|b;
+ 325   1      
+ 326   1        return bcd;
+ 327   1      
+ 328   1      }
+ 329          
+ 330          
+ 331           
+ 332          
+ 333          
+ 334           void show_time()                            //function to display time/date/day on LCD
+ 335          
+ 336          {
+ 337   1      
+ 338   1        char var[5];
+ 339   1      
+ 340   1        lcdcmd(0x80);
+ 341   1      
+ 342   1        lcdprint("Date:");
+ 343   1      
+ 344   1        sprintf(var,"%d",date);
+ 345   1      
+ 346   1        lcdprint(var);
+ 347   1      
+ 348   1        sprintf(var,"/%d",mon);
+ 349   1      
+ 350   1        lcdprint(var);
+ 351   1      
+ 352   1        sprintf(var,"/%d",year+2000);
+ 353   1      
+ 354   1        lcdprint(var);
+ 355   1      
+ 356   1        lcdprint("   ");
+ 357   1      
+ 358   1        lcdcmd(0xc0);
+ 359   1      
+ 360   1        lcdprint("Time:");
+ 361   1      
+ 362   1        sprintf(var,"%d",hour);
+ 363   1      
+ 364   1        lcdprint(var);
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 7   
+
+ 365   1      
+ 366   1        sprintf(var,":%d",min);
+ 367   1      
+ 368   1        lcdprint(var);
+ 369   1      
+ 370   1        sprintf(var,":%d",sec);
+ 371   1      
+ 372   1        lcdprint(var);
+ 373   1      
+ 374   1        lcdprint(" ");
+ 375   1      
+ 376   1        // day(day1);
+ 377   1      
+ 378   1         lcdprint("   ");
+ 379   1      
+ 380   1       }
+ 381          
+ 382          
+ 383           void set_time()                                            //time set function
+ 384          
+ 385          {
+ 386   1      
+ 387   1       lcdcmd(0x0e);
+ 388   1      
+ 389   1       while(k<7)
+ 390   1      
+ 391   1       {
+ 392   2      
+ 393   2        while(k==3)                                            //set date
+ 394   2      
+ 395   2        {
+ 396   3      
+ 397   3         x=year%4;
+ 398   3      
+ 399   3         if(inc==0)
+ 400   3      
+ 401   3         {date++;while(inc==0);
+ 402   4      
+ 403   4         if(x==1 && mon==2 && date==28){date=1;}                //check for 28 day febuary
+ 404   4      
+ 405   4         if(x==0 && mon==2 && date==29){date=1;}                //check for 29 day febuary
+ 406   4      
+ 407   4         if((date==31) && (mon==4) || (mon==6) || (mon==9) || (mon==17)){date=1;}        // check for 30 day mon
+             -th
+ 408   4      
+ 409   4         if(date==32){date=1;}                                                        // check for 31 day month
+ 410   4      
+ 411   4         show_time();}
+ 412   3      
+ 413   3         if(next==0)
+ 414   3      
+ 415   3         {
+ 416   4      
+ 417   4           k=5;
+ 418   4      
+ 419   4           
+ 420   4      
+ 421   4           while(next==0);
+ 422   4      
+ 423   4           }                                                //check for next digit
+ 424   3      
+ 425   3         lcdcmd(0x85);
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 8   
+
+ 426   3      
+ 427   3        }             
+ 428   2      
+ 429   2      
+ 430   2        while(k==2)                                            //set month
+ 431   2      
+ 432   2        {
+ 433   3      
+ 434   3         if(inc==0)
+ 435   3      
+ 436   3         {mon++;while(inc==0);
+ 437   4      
+ 438   4         if(mon==13){mon=1;}                                  //check for end of year
+ 439   4      
+ 440   4         show_time(); }
+ 441   3      
+ 442   3         if(next==0){k=3;
+ 443   4      
+ 444   4         while(next==0);
+ 445   4      
+ 446   4      
+ 447   4         }
+ 448   3      
+ 449   3         lcdcmd(0x88);
+ 450   3      
+ 451   3        }
+ 452   2      
+ 453   2      
+ 454   2        while(k==1)                                         //set year
+ 455   2      
+ 456   2        {
+ 457   3      
+ 458   3         if(inc==0)
+ 459   3      
+ 460   3         {year++;while(inc==0);  
+ 461   4      
+ 462   4         if(year==30){year=0;}                            
+ 463   4      
+ 464   4         show_time();     }
+ 465   3      
+ 466   3         if(next==0){k=2;
+ 467   4      
+ 468   4      
+ 469   4         while(next==0);}
+ 470   3      
+ 471   3         lcdcmd(0x8d);
+ 472   3      
+ 473   3        }
+ 474   2      
+ 475   2      
+ 476   2        while(k==5)                                      //set hour
+ 477   2      
+ 478   2        {
+ 479   3      
+ 480   3         if(inc==0)
+ 481   3      
+ 482   3         {hour++;while(inc==0);
+ 483   4      
+ 484   4         if(hour==24){hour=0;}
+ 485   4      
+ 486   4         show_time();}
+ 487   3      
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 9   
+
+ 488   3         if(next==0){k=6;
+ 489   4      
+ 490   4         while(next==0);}
+ 491   3      
+ 492   3         lcdcmd(0xc5);
+ 493   3      
+ 494   3        }
+ 495   2      
+ 496   2      
+ 497   2        while(k==6)                                       //set min
+ 498   2      
+ 499   2        {
+ 500   3      
+ 501   3         if(inc==0)
+ 502   3      
+ 503   3         {min++;while(inc==0);
+ 504   4      
+ 505   4         if(min==60){min=0;}
+ 506   4      
+ 507   4         show_time();}
+ 508   3      
+ 509   3         if(next==0){k=10;
+ 510   4      
+ 511   4         while(next==0);}
+ 512   3      
+ 513   3         lcdcmd(0xc8);
+ 514   3      
+ 515   3        }
+ 516   2      
+ 517   2       }
+ 518   1      
+ 519   1      } 
+ 520          
+ 521          
+ 522          void main()
+ 523          
+ 524          {
+ 525   1      
+ 526   1          lcd_init();
+ 527   1      
+ 528   1          lcdprint("Digital Clock");
+ 529   1      
+ 530   1          lcdcmd(0xc0);
+ 531   1      
+ 532   1          lcdprint(" Using 8051  ");
+ 533   1      
+ 534   1          delay(400);
+ 535   1      
+ 536   1          lcdcmd(1); 
+ 537   1      
+ 538   1          lcdprint("Circuit Digest");
+ 539   1      
+ 540   1          lcdcmd(192);
+ 541   1      
+ 542   1          lcdprint("Saddam Khan");
+ 543   1      
+ 544   1          delay(400);
+ 545   1      
+ 546   1          while(1)
+ 547   1      
+ 548   1       {
+ 549   2      
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 10  
+
+ 550   2       if(set==0)                                     // check time set button press
+ 551   2      
+ 552   2       {
+ 553   3      
+ 554   3       I2CStart();
+ 555   3      
+ 556   3       I2CSend(0xD0);
+ 557   3      
+ 558   3       I2CSend(0x00);
+ 559   3      
+ 560   3       I2CSend(0x00);
+ 561   3      
+ 562   3       I2CSend(0x00);
+ 563   3      
+ 564   3       I2CSend(0x00);
+ 565   3      
+ 566   3       I2CSend(0x01);
+ 567   3      
+ 568   3       I2CSend(0x01);
+ 569   3      
+ 570   3       I2CSend(0x01);
+ 571   3      
+ 572   3       I2CSend(0x00);    
+ 573   3      
+ 574   3       I2CSend(0x80);    
+ 575   3      
+ 576   3       I2CStop();
+ 577   3      
+ 578   3        k=1;
+ 579   3      
+ 580   3        set_time();                     // call time set function
+ 581   3      
+ 582   3           min=DecimalToBCD(min);
+ 583   3      
+ 584   3         sec=DecimalToBCD(0);
+ 585   3      
+ 586   3            hour=DecimalToBCD(hour);
+ 587   3      
+ 588   3            year=DecimalToBCD(year);
+ 589   3      
+ 590   3            mon=DecimalToBCD(mon);
+ 591   3      
+ 592   3         date=DecimalToBCD(date);                                    
+ 593   3      
+ 594   3        I2CStart();
+ 595   3      
+ 596   3        I2CSend(0xD0);
+ 597   3      
+ 598   3        I2CSend(0x00);
+ 599   3      
+ 600   3        I2CSend(0x00);
+ 601   3      
+ 602   3        I2CSend(min);
+ 603   3      
+ 604   3        I2CSend(hour);
+ 605   3      
+ 606   3        I2CSend(day1);
+ 607   3      
+ 608   3        I2CSend(date);
+ 609   3      
+ 610   3        I2CSend(mon);
+ 611   3      
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 15:55:47 PAGE 11  
+
+ 612   3        I2CSend(year);    
+ 613   3      
+ 614   3        I2CSend(0x80);    
+ 615   3      
+ 616   3        I2CStop(); 
+ 617   3      
+ 618   3        lcdcmd(1);
+ 619   3      
+ 620   3        lcdcmd(0x0c);
+ 621   3      
+ 622   3        }
+ 623   2      
+ 624   2      
+ 625   2        I2CStart();
+ 626   2      
+ 627   2        I2CSend(0xD0);
+ 628   2      
+ 629   2        I2CSend(0x00);
+ 630   2      
+ 631   2        I2CStart();
+ 632   2      
+ 633   2        I2CSend(0xD1);
+ 634   2      
+ 635   2        sec=BCDToDecimal(I2CRead(1));
+ 636   2      
+ 637   2        min=BCDToDecimal(I2CRead(1));
+ 638   2      
+ 639   2        hour=BCDToDecimal(I2CRead(1));
+ 640   2      
+ 641   2        day1=BCDToDecimal(I2CRead(1));
+ 642   2      
+ 643   2        date=BCDToDecimal(I2CRead(1));
+ 644   2      
+ 645   2        mon=BCDToDecimal(I2CRead(1));
+ 646   2      
+ 647   2        year=BCDToDecimal(I2CRead(1));
+ 648   2      
+ 649   2        I2CStop();
+ 650   2      
+ 651   2         show_time();                                           //display time/date/day 
+ 652   2      
+ 653   2         delay(1);
+ 654   2      
+ 655   2       }
+ 656   1      
+ 657   1      }
+ 658          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1284    ----
+   CONSTANT SIZE    =     84    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

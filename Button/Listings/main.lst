@@ -1,0 +1,60 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/06/2023 20:35:47 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2            Chuong trinh dieu khien LED bang nut nhan
+   3            Nut nhan chan: P1_0
+   4            Led:           P2_0
+   5          */
+   6          #include <REGX51.H>
+   7          
+   8          // Khi bao chan
+   9          #define BT P1_0       // Khai bao chan Nut nhan
+  10          #define Led P2_0      // Khai bao chan LED
+  11          
+  12          // Ham tao tre
+  13          void Delay(int time){
+  14   1        int x, y;
+  15   1        for(x = 0; x < time; x++){
+  16   2          for(y = 0; y < 123; y++);
+  17   2        }
+  18   1      }
+  19          
+  20          int main(){
+  21   1        while(1){
+  22   2          // Kiem tra trang thai nut nhan
+  23   2          if(BT == 0){                    // Neu nut nhan(BT) nhan thi ==> LED(P2_0) sang
+  24   3            Delay();                      // Thoi gian cho nhan nut
+*** WARNING C209 IN LINE 24 OF main.c: '_Delay': too few actual parameters
+  25   3            Led = 1;
+  26   3          }
+  27   2          else{                           // Nguoc lai thi LED tat
+  28   3            Delay();
+*** WARNING C209 IN LINE 28 OF main.c: '_Delay': too few actual parameters
+  29   3            Led = 0;
+  30   3          }
+  31   2        }
+  32   1        return 0;
+  33   1      }
+*** WARNING C294 IN LINE 32 OF main.c: unreachable code
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     55    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  0 ERROR(S)

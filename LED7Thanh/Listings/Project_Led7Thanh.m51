@@ -1,0 +1,189 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    12/06/2023  23:06:03  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\main.obj TO .\Objects\Project_Led7Thanh PRINT (.\Listings\P
+>> roject_Led7Thanh.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\main.obj (MAIN)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SIDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?UIDIV)
+
+
+LINK MAP OF MODULE:  .\Objects\Project_Led7Thanh (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     000CH     UNIT         ?DT?MAIN
+            IDATA   0014H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     07FDH                  *** GAP ***
+            CODE    0800H     008CH     UNIT         ?C_C51STARTUP
+            CODE    088CH     008BH     UNIT         ?C?LIB_CODE
+            CODE    0917H     004CH     UNIT         ?PR?MAIN?MAIN
+            CODE    0963H     003EH     UNIT         ?PR?_HIEN_THI?MAIN
+            CODE    09A1H     0030H     UNIT         ?PR?_DELAY?MAIN
+            CODE    09D1H     000DH     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Project_Led7Thanh (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN
+  +--> ?PR?_DELAY?MAIN
+
+?PR?_DELAY?MAIN
+  +--> ?PR?_HIEN_THI?MAIN
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Project_Led7Thanh (?C_STARTUP)
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  12/06/2023  23:06:03  PAGE 2
+
+
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0800H         SEGMENT       ?C_C51STARTUP
+  I:0014H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0803H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0800H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0800H         LINE#         133
+  C:0802H         LINE#         134
+  C:0803H         LINE#         135
+  C:0804H         LINE#         136
+  C:0806H         LINE#         185
+  C:0809H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  B:0090H.0       PUBLIC        P1_0
+  B:00A0H.0       PUBLIC        P2_0
+  B:00B0H.0       PUBLIC        P3_0
+  B:00A0H.1       PUBLIC        P2_1
+  B:00B0H.1       PUBLIC        P3_1
+  B:00A0H.2       PUBLIC        P2_2
+  B:00A0H.3       PUBLIC        P2_3
+  B:00A0H.4       PUBLIC        P2_4
+  B:00A0H.5       PUBLIC        P2_5
+  B:00A0H.6       PUBLIC        P2_6
+  B:00A0H.7       PUBLIC        P2_7
+  C:0917H         PUBLIC        main
+  D:0008H         PUBLIC        dem
+  C:0963H         PUBLIC        _hien_thi
+  D:000AH         PUBLIC        ma_led
+  C:09ABH         PUBLIC        _Delay
+  -------         PROC          _HIEN_THI
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  12/06/2023  23:06:03  PAGE 3
+
+
+  D:0007H         SYMBOL        dulieu
+  C:0963H         LINE#         26
+  C:0963H         LINE#         27
+  C:0967H         LINE#         28
+  C:096DH         LINE#         29
+  C:0975H         LINE#         30
+  C:097EH         LINE#         31
+  C:0985H         LINE#         32
+  C:098DH         LINE#         33
+  C:0996H         LINE#         34
+  C:09A0H         LINE#         35
+  -------         ENDPROC       _HIEN_THI
+  -------         PROC          MAIN
+  C:0917H         LINE#         39
+  C:0917H         LINE#         40
+  C:0917H         LINE#         42
+  C:091AH         LINE#         43
+  C:091DH         LINE#         44
+  C:0925H         LINE#         45
+  C:0925H         LINE#         46
+  C:0932H         LINE#         47
+  C:0937H         LINE#         48
+  C:0937H         LINE#         50
+  C:0939H         LINE#         51
+  C:0947H         LINE#         52
+  C:094AH         LINE#         53
+  C:094CH         LINE#         55
+  C:094EH         LINE#         56
+  C:095CH         LINE#         57
+  C:095FH         LINE#         58
+  C:0961H         LINE#         59
+  -------         ENDPROC       MAIN
+  -------         PROC          L?0019
+  -------         ENDPROC       L?0019
+  -------         PROC          _DELAY
+  D:0006H         SYMBOL        time
+  -------         DO            
+  D:0004H         SYMBOL        x
+  D:0002H         SYMBOL        y
+  -------         ENDDO         
+  C:09ABH         LINE#         63
+  C:09ABH         LINE#         65
+  C:09BBH         LINE#         66
+  C:09C9H         LINE#         67
+  C:09D0H         LINE#         68
+  -------         ENDPROC       _DELAY
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        ?C?SIDIV
+  C:088CH         PUBLIC        ?C?SIDIV
+  -------         ENDMOD        ?C?SIDIV
+
+  -------         MODULE        ?C?UIDIV
+  C:08C2H         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+******************************************************************************
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  12/06/2023  23:06:03  PAGE 4
+
+
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00D5H BYTE (10%) *
+******************************************************************************
+
+Program Size: data=21.0 xdata=0 code=481
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

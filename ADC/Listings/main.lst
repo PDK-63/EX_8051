@@ -1,0 +1,139 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 02:52:36 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\User) DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2            Chuong trinh doc gia tri ADC, hien thi len LED 7 thanh
+   3            Do Chip 8051 khong co ADC, nen ta dung chip ben ngoai, VD: ADC0804, ADC0805,...
+   4            Voi bai toan nay ta su dung chip ADC0804 la bo ADC 8 bit(0 -5V)
+   5            D0 - D7: la chan du lieu(D0: chan du lieu thap nhat
+   6                                     D7: chan du lieu cao nhat
+   7                                     CS:(chip select) chon chip lam viec
+   8                                     RD(read): doc gia tri analog
+   9                                     WR(write): o muc cao bat dau chuyen doi du lieu 
+  10                                     INTR(interupt): keo len muc cao yeu cau ngat
+  11                                     CLK 
+  12                                     
+  13            LM35: cam bien nhiet do
+  14            10mV / 1*C
+  15            ADC0804 (8bit). do phan giai 
+  16            D = 2^n * Vin/Vref          n: do phan giai bo adc(8 bit)
+  17              = 2^8 * Vin/5
+  18              = 51.2 * Vin              Vin: gia tri doc duoc tu cam bien
+  19            
+  20          */
+  21          #include "REGX51.H"
+  22          
+  23          // Dinh nghia chan ADC
+  24          #define CS P3_0         // chon che do chip lam viec(neu dung 2 Bo ADC tro len thi CS = 1, nguoc lai CS =0)
+  25          #define RD P3_1           // Doc gia tri Analog
+  26          #define WR P3_2           // Chan ghi du lieu(o muc cao bat dau chuyen doi du lieu )
+  27          #define INTR P3_3         // keo len muc cao yeu cau ngat
+  28          
+  29          // Dinh nghia chan LED 7 thanh
+  30          // Dinh nghia chan Led 7 thanh
+  31          #define a P2_0          // Khai bao chan a
+  32          #define b P2_1          // Khai bao chan b
+  33          #define c P2_2          // Khai bao chan c
+  34          #define d P2_3          // Khai bao chan d
+  35          #define e P2_4          // Khai bao chan e
+  36          #define f P2_5          // Khai bao chan f
+  37          #define g P2_6          // Khai bao chan g
+  38          #define dp P2_7
+  39          
+  40          #define Hangnghin P0_0        // Dinh nghia hang nghin  
+  41          #define Hangtram  P0_1        // Dinh nghia hang tram
+  42          #define Hangchuc  P0_2        // Dinh nghia hang chuc
+  43          #define Hangdonvi P0_3        // Dinh nghia hang don vi
+  44          
+  45          char ma_led[] ={0xC0,0xF9,0xA4,0xB0,
+  46                    0x99,0x92,0x82,0xF8,0x80,0x90};
+  47          void Delay(int time);
+  48          void hien_thi(unsigned char dulieu){
+  49   1        a = dulieu & 0x01;            // a
+  50   1        b = (dulieu >> 1) & 0x01;     // b
+  51   1        c = (dulieu >> 2) & 0x01;     // c
+  52   1        d = (dulieu >> 3) & 0x01;     // d
+  53   1        e = (dulieu >> 4) & 0x01;     // e
+  54   1        f = (dulieu >> 5) & 0x01;     // f
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 02:52:36 PAGE 2   
+
+  55   1        g = (dulieu >> 6) & 0x01;     // g
+  56   1        dp = (dulieu >> 7) & 0x01;      // dp
+  57   1      }
+  58          
+  59          // Ham doc gia tri ADC
+  60          int Doc_ADC(void){
+  61   1        int kq;
+  62   1        CS = 0;         // vi chi su dung 1 bo ADC
+  63   1        // Tao xung bat dau chuyen doi
+  64   1        WR = 0;         // Yeu cau chuyen doi gia tri
+  65   1        WR = 1;
+  66   1        // CHuyen doi cho den luc chuyen doi xong
+  67   1        while(INTR);  
+  68   1        RD = 0;
+  69   1        kq = P1;          // DOc  gia tri PORT2
+  70   1        RD = 1;
+  71   1        return kq;
+  72   1      }
+  73          
+  74          int main(){
+  75   1        int adc;                                  // Khai bao bien adc
+  76   1        char nhietdo;                             // Khai bao bien nhiet do
+  77   1        while(1){
+  78   2          adc = Doc_ADC();
+  79   2          nhietdo = (adc*100) / 51.2f;
+  80   2          Hangnghin = 1;                          // Muon hien thi LED nao, thi cho LED day sang
+  81   2          hien_thi(ma_led[nhietdo /1000]);
+  82   2          Delay(10);
+  83   2          Hangnghin = 0;
+  84   2          
+  85   2          // Su dung phuong phap quet LED hien thi len LED 7 thanh
+  86   2          // Hien thi hang tram
+  87   2          Hangtram = 1;
+  88   2          hien_thi(ma_led[(nhietdo % 1000) / 100]);
+  89   2          Delay(10);
+  90   2          Hangtram = 0;
+  91   2          
+  92   2          // Hien thi hang chuc
+  93   2          Hangchuc = 1;
+  94   2          hien_thi(ma_led[(nhietdo % 1000 % 100) / 10]);
+  95   2          Delay(10);
+  96   2          Hangchuc = 0;
+  97   2          
+  98   2          // Hien thi hang don vi
+  99   2          Hangdonvi = 1;
+ 100   2          hien_thi(ma_led[nhietdo % 1000 % 100 % 10]);
+ 101   2          Delay(10);
+ 102   2          Hangdonvi = 0;
+ 103   2        }
+ 104   1      }
+ 105          
+ 106          void Delay(int time){
+ 107   1        int x, y;
+ 108   1        for(x = 0; x < time; x++){
+ 109   2          for(y = 0; y < 123; y++);
+ 110   2        }
+ 111   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    308    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V9.60.7.0   MAIN                                                              12/11/2023 02:52:36 PAGE 3   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

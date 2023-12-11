@@ -1,0 +1,84 @@
+C51 COMPILER V9.60.7.0   LCD16X02                                                          12/11/2023 00:41:15 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LCD16X02
+OBJECT MODULE PLACED IN .\Objects\lcd16x02.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE User\lcd16x02.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\User) DEBUG OBJECTEXTE
+                    -ND PRINT(.\Listings\lcd16x02.lst) TABS(2) OBJECT(.\Objects\lcd16x02.obj)
+
+line level    source
+
+   1          #include "lcd16x02.h"
+   2          
+   3          void Delay(int time){
+   4   1        int x, y;
+   5   1        for(x = 0; x < time; x++){
+   6   2          for(y = 0; y , 123; y++);
+   7   2        }
+   8   1      }
+   9          
+  10          void Lcd_Dulieu(unsigned char dulieu){
+  11   1        D0 = dulieu & 0x01;
+  12   1        D1 = (dulieu >> 1) & 0x01;
+  13   1        D2 = (dulieu >> 2) & 0x01;
+  14   1        D3 = (dulieu >> 3) & 0x01;
+  15   1        D4 = (dulieu >> 4) & 0x01;
+  16   1        D5 = (dulieu >> 5) & 0x01;
+  17   1        D6 = (dulieu >> 6) & 0x01;
+  18   1        D7 = (dulieu >> 7) & 0x01;
+  19   1      }
+  20          
+  21          void Lcd_Cauhinh(void){
+  22   1        Lcd_Ghi_Lenh(0x03);
+  23   1        Lcd_Ghi_Lenh(0x38);         // Giao tiep voi XL 8 chan(D0 - D7)
+  24   1        // Lcd_Ghi_Lenh(0x28);      // Giao tiep voi VXL 4 chan(D4 - D7)
+  25   1        Lcd_Ghi_Lenh(0x06);         // Tu dong dua con tro den tri tri tiep theo (trai -> phai)
+  26   1        Lcd_Ghi_Lenh(0x0c);         // Bat hien thi con tro
+  27   1        Lcd_Ghi_Lenh(0x01);         // Xoa man hinh
+  28   1      }
+  29          
+  30          void Lcd_Ghi_Lenh(char lenh){
+  31   1        RS = 0;                     // muc thap, chon che do ghi lenh
+  32   1        RW = 0;                     // muc thap, chon che do thanh ghi  
+  33   1        EN = 1;                     // muc cao, chuan bi tao su chuyen muc logic tu "1" -> "0" tao tin hieu cho phep ghi
+  34   1        Lcd_Dulieu(lenh);
+  35   1        Delay(10);
+  36   1        EN = 0;                     // muc thap, hoan tat su tao chuyen muc logic "1" sang "0"
+  37   1        Delay(10);
+  38   1      }
+  39          
+  40          // Ham, ghi du lieu
+  41          void Lcd_Ghi_Dulieu(char dulieu){
+  42   1        RS = 1;               
+  43   1        RW = 0;
+  44   1        EN = 1;
+  45   1        Lcd_Dulieu(dulieu);
+  46   1        Delay(10);
+  47   1        EN = 0;
+  48   1        Delay(10);
+  49   1      }
+  50          
+  51          // Ham ghi chuoi
+  52          void LCD_Ghi_Chuoi(char *str){
+  53   1        while(*str){
+  54   2          Lcd_Ghi_Dulieu(*str);
+C51 COMPILER V9.60.7.0   LCD16X02                                                          12/11/2023 00:41:15 PAGE 2   
+
+  55   2          str++;
+  56   2        }
+  57   1      }
+  58          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    193    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

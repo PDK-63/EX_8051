@@ -1,0 +1,83 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/06/2023 21:31:39 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2            Viet chuong trinh dieu khien LED 7 Thanh(don), hien thi so lan nhan nut
+   3          */
+   4          #include <REGX51.H>
+   5          
+   6          // Khai bao chan vao ra
+   7          #define a P2_0          // Khai bao chan a
+   8          #define b P2_1          // Khai bao chan b
+   9          #define c P2_2          // Khai bao chan c
+  10          #define d P2_3          // Khai bao chan d
+  11          #define e P2_4          // Khai bao chan e
+  12          #define f P2_5          // Khai bao chan f
+  13          #define g P2_6          // Khai bao chan g
+  14          #define dp P2_7
+  15          
+  16          #define nutnhan P1_0
+  17          // Khai bao ma Led 7 Thanh
+  18          char ma_led[] ={0xC0,0xF9,0xA4,0xB0,
+  19                                    0x99,0x92,0x82,0xF8,0x80,0x90};
+  20          int dem;              // Khoi tao bien dem ban dau = 0
+  21          
+  22          void Delay(int time);               
+  23          void hienthi(unsigned char dulieu){
+  24   1        a = dulieu & 0x01;
+  25   1        b = (dulieu >> 1) & 0x01;
+  26   1        c = (dulieu >> 2) & 0x01;
+  27   1        d = (dulieu >> 3) & 0x01;
+  28   1        e = (dulieu >> 4) & 0x01;
+  29   1        f = (dulieu >> 5) & 0x01;
+  30   1        g = (dulieu >> 6) & 0x01;
+  31   1        dp = (dulieu >> 7) & 0x01;
+  32   1      }
+  33          
+  34          int main(){
+  35   1        
+  36   1        while(1){
+  37   2          if(nutnhan == 0){
+  38   3            while(nutnhan == 0);
+  39   3            dem++;
+  40   3          }
+  41   2          if(dem > 9){
+  42   3            dem = 0;
+  43   3          }
+  44   2          hienthi(ma_led[dem]);
+  45   2          Delay(10);
+  46   2        }
+  47   1        return 0;
+  48   1      }
+  49          
+  50          // Ham tao tre
+  51          void Delay(int time){
+  52   1        int x, y;
+  53   1        for(x = 0; x < time; x++){
+  54   2          for(y = 0; y < 123; y++);       // tao tre 1ms
+C51 COMPILER V9.60.7.0   MAIN                                                              12/06/2023 21:31:39 PAGE 2   
+
+  55   2        }
+  56   1      }
+*** WARNING C294 IN LINE 47 OF main.c: unreachable code
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    151    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
