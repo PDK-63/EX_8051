@@ -1,0 +1,48 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/17/2023 02:23:24 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*
+   2            Chuong trinh Dieu khien Relay
+   3            *Neu muon dieu khien nhieu Kenh Relay can IC cong suat mo rong Vd: ULN2003N, dieu  khien toi da 7 kenh
+   4          */
+   5          #include <REGX51.H>
+   6          sbit Relay = P2^0;
+   7          
+   8          void Delay(int t);
+   9          int main(){
+  10   1        Relay = 0;
+  11   1        while(1){
+  12   2          Relay = 1;          // Kich trang thai Relay
+  13   2          Delay(1000);
+  14   2          Relay = 0;          // Tat trang thai Relay
+  15   2          Delay(1000);
+  16   2        }
+  17   1      }
+  18          
+  19          void Delay(int t){
+  20   1        unsigned x, y;
+  21   1        for(x = 0; x < t; x++){
+  22   2          for(y = 0; y < 123; y++);
+  23   2        }
+  24   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     54    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

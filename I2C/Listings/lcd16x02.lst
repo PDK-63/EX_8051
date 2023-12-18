@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   LCD16X02                                                          12/11/2023 15:55:47 PAGE 1   
+C51 COMPILER V9.60.7.0   LCD16X02                                                          12/12/2023 12:21:42 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LCD16X02
@@ -62,7 +62,7 @@ line level    source
   52   1        Delay(10);
   53   1      }
   54          
-C51 COMPILER V9.60.7.0   LCD16X02                                                          12/11/2023 15:55:47 PAGE 2   
+C51 COMPILER V9.60.7.0   LCD16X02                                                          12/12/2023 12:21:42 PAGE 2   
 
   55          // Ham ghi chuoi
   56          void LCD_Ghi_Chuoi(char *str){

@@ -19,24 +19,32 @@ CPU DLL:         S8051.DLL V3.125.1.0
 Dialog DLL:      DP51.DLL V2.69.0.0 
 <h2>Project:</h2>
 C:\Users\Khanh\Desktop\Example_8051\I2C\Project_DS1307.uvproj
-Project File Date:  12/11/2023
+Project File Date:  12/12/2023
 
 <h2>Output:</h2>
 Rebuild target 'Target 1'
 assembling STARTUP.A51...
 compiling main.c...
-compiling lcd16x02.c...
+main.c(160): warning C173: missing return-expression
+main.c(169): warning C206: 'I2CRestart': missing function-prototype
+main.c(160): warning C290: missing return value
+main.c(230): warning C294: unreachable code
 linking...
-*** ERROR L104: MULTIPLE PUBLIC DEFINITIONS
-    SYMBOL:  _DELAY
-    MODULE:  .\Objects\lcd16x02.obj (LCD16X02)
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?_LCD_GHI_CHUOI?LCD16X02
+    SEGMENT: ?PR?I2C_RESTART?MAIN
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
-    SEGMENT: ?PR?LCD_CAUHINH?LCD16X02
-Program Size: data=54.1 xdata=0 code=2917
-Target not created.
-Build Time Elapsed:  00:00:00
+    SEGMENT: ?PR?_I2C_DATA_WRITE?MAIN
+*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  I2CRESTART
+    MODULE:  .\Objects\main.obj (MAIN)
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  I2CRESTART
+    MODULE:  .\Objects\main.obj (MAIN)
+    ADDRESS: 0F62H
+Program Size: data=55.1 xdata=0 code=2136
+creating hex file from ".\Objects\Project_DS1307"...
+".\Objects\Project_DS1307" - 0 Error(s), 8 Warning(s).
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
